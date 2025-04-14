@@ -206,4 +206,47 @@ public class InlineFormatStringTest {
             """)
         .doTest();
   }
+
+  @Test
+  public void negativeLocal() {
+    compilationHelper
+        .addSourceLines(
+            "Test.java",
+            """
+            class Test {
+              void f(String a) {
+                String format = a;
+                System.err.printf(format, 42);
+              }
+            }
+            """)
+        .doTest();
+  }
+
+  @Test
+  public void refactoringLocal() {
+    refactoringHelper
+        .addInputLines(
+            "Test.java",
+            """
+            class Test {
+              void f() {
+                String format = "hello %s";
+                System.err.printf(format, 42);
+                System.err.printf(format, 42);
+              }
+            }
+            """)
+        .addOutputLines(
+            "Test.java",
+            """
+            class Test {
+              void f() {
+                System.err.printf("hello %s", 42);
+                System.err.printf("hello %s", 42);
+              }
+            }
+            """)
+        .doTest();
+  }
 }
